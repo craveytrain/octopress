@@ -1,0 +1,11 @@
+/* tablet threshold */
+@media only screen and (min-width: 45em) {
+	#toggleNav {
+		display: none;
+	}
+	
+	.main {
+		width: auto;
+		left: 35%;
+	}
+}

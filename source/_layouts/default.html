@@ -1,0 +1,18 @@
+{% capture root_url %}{{ site.root | strip_slash }}{% endcapture %}
+{% include head.html %}
+
+<body{% if page.body_id %} id="{{ page.body_id }}"{% endif %} class="{{page.class}}">
+{% if page.class == 'home' %}
+	{% include header.html %}
+{% endif %}
+
+{% include navigation.html %}
+
+	<section class="main" role="main">
+		{{ content | expand_urls: root_url }}
+	</section>
+
+	{% include footer.html %}
+	{% include after_footer.html %}
+</body>
+</html>

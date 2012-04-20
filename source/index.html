@@ -1,0 +1,38 @@
+---
+layout: default
+class: home
+---
+
+{% assign index = true %}
+
+{% for post in site.posts limit: site.recent_posts %}
+	{% assign content = post.content %}
+	<article id="latest-post">
+		<h2>Latest Post</h2>
+		{% include article.html %}
+	</article>
+{% endfor %}
+
+	<article id="about">
+		<h2>About</h2>
+
+		<p>Hi, my name is Mike Cravey and I am a geek. I love technology. I believe in standards. I believe in doing things the right way.</p>
+
+		<p>I believe in the importance of strong social skills. I still shake hands with a firm grip and look people in the eye during a conversation.</p>
+
+		<p>I like to think I am a good engineer/developer/whatever we are calling ourselves these days. I still delude myself into believing we should strive for some semblance of privacy on the web. I love the idea of location-aware services and they simultaneously scare me.</p>
+		<p>I love to learn, about anything. I get a little proud sometimes and need to get knocked off my tree stump occasionally. I am obviously starved for content.</p>
+	</article>
+
+	<article id="contact">
+		<h2>Contact</h2>
+
+		<p>Have something to say you would like me to hear? Feel free to drop me a line at any one of the following fine establishments (or anywhere else you see me):</p>
+
+		<ul>
+			<li><a href="http://twitter.com/craveytrain">Twitter</a></li>
+			<li><a href="http://github.com/craveytrain">GitHub</a></li>
+			<li><a href="http://www.linkedin.com/in/craveytrain">LinkedIn</a></li>
+			<li><a href="http://www.flickr.com/photos/craveytrain/">Flickr</a></li>
+		</ul>
+	</article>
