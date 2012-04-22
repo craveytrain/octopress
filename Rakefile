@@ -1,6 +1,9 @@
 require "rubygems"
 require "bundler/setup"
 require "stringex"
+require "uglifier"
+require "digest/sha1"
+
 
 ## -- Rsync Deploy config -- ##
 # Be sure your public key is listed in your server's ~/.ssh/authorized_keys file
@@ -47,12 +50,51 @@ end
 # Working with Jekyll #
 #######################
 
+desc "Minifies JavaScript & CSS files"
+task :minify do
+  raise "### You haven't set anything up yet. First run `rake install` to set up an Octopress theme." unless File.directory?(source_dir)
+  raise "### Node needs to be installed to run `Uglifier" unless system("node -v > /dev/null") == true
+  puts "## Minifying JavaScript"
+
+  files = Hash.new
+
+  uglifier = Uglifier.new
+  Dir["#{source_dir}/{javascripts,stylesheets}/*.{j,cs}s"].each do |file|
+    extension = File.extname(file)
+    filename = File.basename(file)
+    basename = File.basename(filename, extension)
+    minified_contents = extension == ".js" ? uglifier.compile( File.read( file ) ) : File.read( file )
+    hash = Digest::SHA1.hexdigest minified_contents
+    minified_filename = "#{basename}-#{hash[0..7]}#{extension}"
+
+    File.open(file.sub(/#{source_dir}/, public_dir).sub(/#{filename}/, minified_filename), 'w') do |fwrite|
+      puts "- #{file}"
+      fwrite.write( minified_contents )
+    end
+
+    files[filename] = minified_filename
+  end
+
+  puts "## Updating references to files"
+  Dir["#{public_dir}/**/*.html"].each do |html|
+    contents = File.read html
+    File.open(html, "w") do |f|
+      files.each do |asset|
+        contents = contents.gsub(/#{asset[0]}/, "#{asset[1]}") if contents.match asset[0]
+      end
+
+      f.puts contents
+    end
+  end
+end
+
 desc "Generate jekyll site"
 task :generate do
   raise "### You haven't set anything up yet. First run `rake install` to set up an Octopress theme." unless File.directory?(source_dir)
   puts "## Generating Site with Jekyll"
   system "compass compile --css-dir #{source_dir}/stylesheets"
   system "jekyll"
+  Rake::Task[:minify].execute
 end
 
 desc "Watch the site and regenerate when it changes"
