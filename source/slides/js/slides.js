@@ -6,9 +6,10 @@
 				if (!'onhashchange' in window) return false; // Bool
 
 				return true; // Bool
-			}()), 
+			}()),
 			currentIdx,
 			slides,
+			toc,
 			storedCodes = [],
 			states = ['past', 'current', 'future'],
 			addClass = function(/* DOM Node */el, /* String */className) {
@@ -16,7 +17,7 @@
 				if (!el.className.match(re)) el.className += ((el.className.length) ? ' ' : '') + className;
 			},
 			remClass = function(/* DOM Node */el, /* String */className) {
-				var re = RegExp('[\\b\\s]' + className + '\\b');
+				var re = RegExp('\\b' + className + '\\b');
 				el.className = el.className.replace(re, '');
 			},
 			getId = function(/* Int */idx) {
@@ -24,7 +25,7 @@
 			},
 			getCurrent = function(/* String */hash) {
 				var current, i;
-						
+
 				if (hash) {
 					current = d.getElementById(hash);
 					if (current) {
@@ -43,18 +44,23 @@
 			showCurrent = function(/* Int */idx, /* Boolean */reset) {
 				var classAction = reset ? remClass : addClass,
 						lastIdx = slides.length - 1;
-						
+
 				classAction.call(this, slides[idx], states[1]);
-				
+
 				if (idx > 0) classAction.call(this, slides[idx - 1], states[0]);
-				
+
 				if (idx < lastIdx) classAction.call(this, slides[idx + 1], states[2]);
-				
+
+				console.log(reset);
+				console.log(idx);
+
+				classAction.call(this, toc[idx], 'current');
+
 				currentIdx = idx;
 			},
 			keyHandler = function(e) {
 				if (typeof e.target.getAttribute('contenteditable') === 'string') return;
-				
+
 				switch (e.keyCode) {
 					// Enter
 					case 13:
@@ -90,11 +96,11 @@
 					hash = getId(1);
 				}
 				d.location.hash = hash;
-				
+
 			},
 			hashHandler = function() {
 				var idx = getCurrent(d.location.hash.substring(1));
-				
+
 				showCurrent(currentIdx, true);
 				showCurrent(idx);
 			},
@@ -103,32 +109,48 @@
 						i = 0,
 						l = codes.length,
 						code;
-						
+
 				for (; i < l; i++) {
 					code = codes[i];
 					code.className += ((code.className) ? ' ' : '') + 'prettyprint';
 					storedCodes[i] = code.innerText;
 				}
-				
+
 				if (l) prettyPrint();
+			},
+			buildIndex = function() {
+				var index = d.createElement('ol'), str = '';
+				index.id = 'index';
+
+				Array.prototype.forEach.apply(slides, [function(slide) {
+					var title = slide.querySelector('h1').innerText;
+					str += '<li><a href="#' + slide.id + '">' + title + '</a></li>';
+				}]);
+
+				index.innerHTML = str;
+
+				d.body.appendChild(index);
+
+				toc = index.querySelectorAll('li');
 			},
 			init = function() {
 				slides = d.querySelectorAll('.slide');
-				
+
 				var idx = getCurrent(d.location.hash.substring(1));
-				
+
 				addClass(d.body, 'show');
-				
+
 				if (idx === 0) d.location.hash = getId(1);
-				
+
+				buildIndex();
+
 				showCurrent(idx);
-				
+
 				d.addEventListener('keydown', keyHandler, false);
-								
+
 				window.addEventListener('hashchange', hashHandler, false);
-				
+
 				prettify();
-				
 			};
 
 	if (hasSupport) d.addEventListener('DOMContentLoaded', init, false);
