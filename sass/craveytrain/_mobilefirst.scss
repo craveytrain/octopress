@@ -145,6 +145,24 @@ blockquote {
   }
 }
 
+#contact {
+	ul {
+		padding: 0;
+	}
+
+	li {
+		position: relative;
+		margin-left: -25px;
+		padding-left: 25px;
+		list-style: none;
+
+		&:before {
+			position: absolute;
+			left: 0;
+		}
+	}
+}
+
 @media only screen and (min-width: 30em) {
 	.nav-search {
 		bottom: auto;
